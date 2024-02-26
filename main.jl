@@ -14,14 +14,31 @@ end
     min_quality::Int
     desired_quality::Int
     months_renting::Int
-    address::NTuple{2,Int}
+    address::Int
 end
 
 OUT_OF_TOWN = (1, 1)
 
 function agent_step(agent::Renter, model)
-    if agent.address != OUT_OF_TOWN
+    if agent.address != 0
         agent.months_renting += 1
+    end
+    if agent.address == 0 || agent.months_renting % getproperty(model, :contract_duration) == 0
+        all_agents = collect(allagents(model))
+        # filter to leave only rentals
+        all_agents = filter(x -> x isa Rental, all_agents)
+        all_unoccupied = filter(x -> x.tenant == 0, all_agents)
+        # sort on how close they are to the desired quality, descending
+        all_unoccupied = sort(all_unoccupied, by=x -> abs(x.quality - agent.desired_quality), rev=true)
+        # sort on rent descending
+        all_unoccupied = sort(all_unoccupied, by=x -> x.rent, rev=true)
+        # filter out the ones that are too expensive or below the minimum quality
+        all_unoccupied = filter(x -> x.rent <= agent.max_rent && x.quality >= agent.min_quality, all_unoccupied)
+        if length(all_unoccupied) > 0
+            chosen = all_unoccupied[1]
+            agent.address = chosen.id
+            chosen.tenant = agent.id
+        end
     end
     return
 end
