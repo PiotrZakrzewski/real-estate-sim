@@ -3,7 +3,7 @@ using Test
 include("main.jl")
 
 
-@testset "Test agent_step: vacany duration tracking" begin
+@testset "Test agent_step: Vacancy duration tracking" begin
     test_model1 = init_model()
 
     rental1 = add_agent!((1, 2), Rental, test_model1, 1, 1, 1, 0, 0, 0)
@@ -22,7 +22,7 @@ include("main.jl")
     @test 0 == rental1.months_vacant
 end
 
-@testset "Test agent_step: lowering rent when vacant" begin
+@testset "Test agent_step: Lowering rent when vacant" begin
     test_model2 = init_model()
 
     rental2 = add_agent!((1, 2), Rental, test_model2, 1000, 50, 500, 10, 0, 0)
@@ -31,4 +31,19 @@ end
     @test 11 == rental2.months_vacant
     @test 0 == rental2.months_occupied
     @test 950 == rental2.rent
+end
+
+@testset "Test agent_step: Increasing the rent when occudpied" begin
+    test_model3 = init_model()
+
+    rental3 = add_agent!((1, 2), Rental, test_model3, 1000, 50, 500, 10, 0, 0)
+    renter3 = add_agent!(OUT_OF_TOWN, Renter, test_model3, 1000, 50, 500, 0, OUT_OF_TOWN)
+
+    rental3.tenant = renter3.id
+    renter3.address = (1, 2)
+
+    step!(test_model3, agent_step, 1)
+    @test 0 == rental3.months_vacant
+    @test 1 == rental3.months_occupied
+    @test 1050 == rental3.rent
 end
