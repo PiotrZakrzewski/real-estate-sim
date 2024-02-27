@@ -1,6 +1,6 @@
 using Agents
 
-@agent Rental NoSpaceAgent begin
+@agent Rental GridAgent{2} begin
     rent::Int
     quality::Int
     minimum_rent::Int
@@ -9,7 +9,7 @@ using Agents
     tenant::Int
 end
 
-@agent Renter NoSpaceAgent begin
+@agent Renter GridAgent{2} begin
     max_rent::Int
     min_quality::Int
     desired_quality::Int
@@ -36,6 +36,8 @@ function agent_step(agent::Renter, model)
             chosen = all_unoccupied[1]
             agent.address = chosen.id
             chosen.tenant = agent.id
+            occupied_pos = (chosen.pos[1], 2)
+            move_agent!(agent, occupied_pos, model)
         end
     end
     return
@@ -63,8 +65,9 @@ function agent_step(agent::Rental, model)
     return
 end
 
-function init_model()
+function init_model(size::Int=10)
+    space = GridSpace((size, 3))
     model_properties = Dict(:contract_duration => 12, :max_rent_increase_perc => 0.05, :rent_decrease_perc => 0.05)
-    market_model = ABM(Union{Rental,Renter}; properties=model_properties)
-    return market_model
+    return ABM(Union{Rental,Renter}, space; properties=model_properties)
 end
+
