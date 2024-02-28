@@ -39,10 +39,18 @@ run!(test_model1, agent_step, 2)
 
 groupcolor(a) = a isa Renter ? :blue : :orange
 groupmarker(a) = a isa Renter ? :circle : :rect
-fig, ax, abmobs = abmplot(test_model1, ac=groupcolor, am=groupmarker)
+text_labels = ["", "", "Out of Town", "", "Residents", "", "Rentals", "", ""]
+axis_customizations = (
+    title = "",
+    xlabel = "",
+    ylabel = "",
+    yticks = (0:0.5:4 ,text_labels),
+
+)
+fig, ax, abmobs = abmplot(test_model1, ac=groupcolor, am=groupmarker, axis=axis_customizations)
 
 Label(fig[0, :], "Average Rent: $(average_rent(test_model1))", fontsize=60)
-hidedecorations!(ax)
+# hidedecorations!(ax)
 
 elem_1 = [MarkerElement(color=:blue, marker=:circle, markersize=15, strokecolor=:black)]
 elem_2 = [MarkerElement(color=:orange, marker=:rect, markersize=15, strokecolor=:black)]
