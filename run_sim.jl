@@ -33,13 +33,13 @@ function average_rent(model)
     return total_rent / length(all_agents)
 end
 
-add_rentals!(10, 1000, 50, test_model1)
-add_renters!(10, 1100, 40, 55, test_model1)
-run!(test_model1, agent_step, 2)
+add_rentals!(9, 1000, 50, test_model1)
+add_renters!(3, 2000, 40, 55, test_model1)
+run!(test_model1, agent_step, 48)
 
 groupcolor(a) = a isa Renter ? :blue : :orange
 groupmarker(a) = a isa Renter ? :circle : :rect
-text_labels = ["", "", "Out of Town", "", "Residents", "", "Rentals", "", ""]
+text_labels = ["", "", "Looking", "", "Found", "", "Rentals", "", ""]
 axis_customizations = (
     title = "",
     xlabel = "",
