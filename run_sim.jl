@@ -1,7 +1,7 @@
 
-include("/home/gieku/sideprojects/real-estate-sim/main.jl")
+include("main.jl")
 using Agents
-using CairoMakie # choosing a plotting backend
+using CairoMakie
 using Random
 using Statistics
 
@@ -25,18 +25,47 @@ function add_renters!(number::Int, max_rent_average::Int, min_quality_average::I
     end
 end
 
-function average_rent(model)
-    all_agents = collect(allagents(model))
-    all_agents = filter(x -> x isa Rental, all_agents)
-    total_rent = sum([x.rent for x in all_agents])
-    return total_rent / length(all_agents)
-end
-
 add_rentals!(2, 1000, 50, test_model1)
 add_renters!(1, 2000, 40, 55, test_model1)
 
 is_rental(a) = a isa Rental
+is_renter(a) = a isa Renter
 
-agent_df, model_df = run!(test_model1, agent_step, 48, adata = [(:rent, mean, is_rental)])
+is_empty(tenant) = tenant == 0
+is_homeless(address) = address == 0
+
+count_empty_rentals(tenants) = count(is_empty, tenants)
+count_homeless(addresses) = count(is_homeless, addresses)
+
+function housing_satisfaction(agent_ids)
+    renters = []
+    for agent_id in agent_ids
+        agent = test_model1[agent_id]
+        if is_renter(agent)
+            push!(renters, agent)
+        end
+    end
+    satisfaction = []
+    println(renters)
+    for renter in renters
+        if renter.address != 0
+            rental = test_model1[renter.address]
+            push!(satisfaction, 100 - (renter.desired_quality - rental.quality))
+        end
+    end
+    if length(satisfaction) == 0
+        return 0
+    end
+    return mean(satisfaction)
+end
+
+
+agent_df, model_df = run!(test_model1, agent_step, 48, adata=[
+    (:rent, mean, is_rental),
+    (:tenant, count_empty_rentals, is_rental),
+    (:address, count_homeless, is_renter),
+    (:id, housing_satisfaction)
+],
+)
 
 println(agent_df)
