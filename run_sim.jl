@@ -25,8 +25,8 @@ function add_renters!(number::Int, max_rent_average::Int, min_quality_average::I
     end
 end
 
-add_rentals!(2, 1000, 50, test_model1)
-add_renters!(1, 2000, 40, 55, test_model1)
+add_rentals!(20, 1000, 50, test_model1)
+add_renters!(21, 2000, 40, 55, test_model1)
 
 is_rental(a) = a isa Rental
 is_renter(a) = a isa Renter
@@ -49,7 +49,7 @@ function housing_satisfaction(agent_ids)
     if length(satisfaction) == 0
         return 0
     end
-    return mean(satisfaction)
+    return round(mean(satisfaction))
 end
 
 
