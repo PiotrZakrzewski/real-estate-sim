@@ -38,15 +38,8 @@ count_empty_rentals(tenants) = count(is_empty, tenants)
 count_homeless(addresses) = count(is_homeless, addresses)
 
 function housing_satisfaction(agent_ids)
-    renters = []
-    for agent_id in agent_ids
-        agent = test_model1[agent_id]
-        if is_renter(agent)
-            push!(renters, agent)
-        end
-    end
+    renters = [test_model1[agent_id] for agent_id in agent_ids if is_renter(test_model1[agent_id])]
     satisfaction = []
-    println(renters)
     for renter in renters
         if renter.address != 0
             rental = test_model1[renter.address]
