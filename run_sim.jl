@@ -43,7 +43,7 @@ function housing_satisfaction(agent_ids)
     for renter in renters
         if renter.address != 0
             rental = test_model1[renter.address]
-            push!(satisfaction, 100 - (renter.desired_quality - rental.quality))
+            push!(satisfaction, min(100 - (renter.desired_quality - rental.quality), 100))
         end
     end
     if length(satisfaction) == 0
@@ -62,3 +62,32 @@ agent_df, model_df = run!(test_model1, agent_step, 48, adata=[
 )
 
 println(agent_df)
+
+f = Figure()
+ax1 = Axis(f[1, 1],
+    title = "Average rent over time",
+    xlabel = "Time [month]",
+    ylabel = "Average Rent [€]",
+)
+ax2 = Axis(f[1, 2],
+    title = "Homeless renters over time",
+    xlabel = "Time [month]",
+    ylabel = "Number of homeless renters",
+)
+ax3 = Axis(f[2, 1],
+    title = "Housing satisfaction over time",
+    xlabel = "Time [month]",
+    ylabel = "Score (100 is optimal)",
+)
+ax4 = Axis(f[2, 2],
+    title = "Empty rentals over time",
+    xlabel = "Time [month]",
+    ylabel = "Empty rentals",
+)
+
+
+lines!(ax1, agent_df[!, :step], agent_df[!, :mean_rent_is_rental], color = :blue)
+lines!(ax2, agent_df[!, :step], agent_df[!, :count_homeless_address_is_renter], color = :red)
+lines!(ax3, agent_df[!, :step], agent_df[!, :housing_satisfaction_id], color = :green)
+lines!(ax4, agent_df[!, :step], agent_df[!, :count_empty_rentals_tenant_is_rental], color = :orange)
+save("rental_simulation.png", f)
