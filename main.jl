@@ -1,4 +1,5 @@
 using Agents
+using Statistics
 
 @agent Rental NoSpaceAgent begin
     rent::Int
@@ -48,7 +49,7 @@ function agent_step(agent::Renter, model)
             agent.address = chosen.id
             chosen.tenant = agent.id
             println("Renter $(agent.id) is moving into rental $(chosen.id)!")
-        else 
+        else
             println("Renter $(agent.id) couldn't find a rental!")
         end
     end
@@ -59,6 +60,20 @@ function agent_step(agent::Rental, model)
     if agent.tenant == 0
         agent.months_occupied = 0
         agent.months_vacant += 1
+        # first month vacant - this is the time the landlord will look at the average market rent and use it as a new one
+        if agent.months_vacant == 1
+            all_agents = collect(allagents(model))
+            other_rentals = filter(x -> (x isa Rental && x.id != agent.id), all_agents)
+            similar_quality = filter(x -> abs(x.quality - agent.quality) < 5, other_rentals)
+            if length(similar_quality) < 2
+                println("Not enough similar rentals to calculate the market rent for rental $(agent.id)! Will keep the current rent.")
+                return
+            end
+            agent.rent = mean([x.rent for x in similar_quality])
+            println("Market rent for rental $(agent.id) is $(agent.rent)!")
+            return
+        end
+
         rent_decrease = getproperty(model, :rent_decrease_perc) * agent.rent
         # round up to the nearest integer
         rent_decrease = Int(ceil(rent_decrease))

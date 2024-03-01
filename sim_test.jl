@@ -33,6 +33,20 @@ end
     @test 950 == rental2.rent
 end
 
+@testset "Test agent step: Setting rent to the market average when vacant" begin
+    test_model = init_model()
+    # add 3 occupied rentals of quality between 46 and 54
+    add_agent!(Rental, test_model, 900, 46, 500, 10, 0, 1)
+    add_agent!(Rental, test_model, 1000, 50, 500, 10, 0, 2)
+    add_agent!(Rental, test_model, 1100, 54, 500, 10, 0, 3)
+    # now the unoccupied rental of quality 50, with starting rent of 0 and 0 months occupied, should have its rent set to 1000
+    rental = add_agent!(Rental, test_model, 0, 50, 0, 0, 0, 0)
+    step!(test_model, agent_step, 1)
+    @test 1 == rental.months_vacant
+    @test 0 == rental.months_occupied
+    @test 1000 == rental.rent
+end
+
 @testset "Test agent_step: Increasing the rent when occupied" begin
     test_model3 = init_model()
 
