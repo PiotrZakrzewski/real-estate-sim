@@ -80,7 +80,7 @@ function agent_step(agent::Rental, model)
                 println("Not enough similar rentals to calculate the market rent for rental $(agent.id)! Will keep the current rent.")
                 return
             end
-            agent.rent = mean([x.rent for x in similar_quality])
+            agent.rent = Int(ceil(mean([x.rent for x in similar_quality])))
             println("Market rent for rental $(agent.id) is $(agent.rent)!")
             return
         end

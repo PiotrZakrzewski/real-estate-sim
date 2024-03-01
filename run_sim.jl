@@ -53,12 +53,12 @@ function housing_satisfaction(agent_ids)
 end
 
 
-agent_df, model_df = run!(test_model1, agent_step, 48, adata=[
+agent_df, model_df = run!(test_model1, agent_step, model_step, 48, adata=[
     (:rent, mean, is_rental),
     (:tenant, count_empty_rentals, is_rental),
     (:address, count_homeless, is_renter),
     (:id, housing_satisfaction)
-],
+]
 )
 
 println(agent_df)
