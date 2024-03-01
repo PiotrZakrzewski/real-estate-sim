@@ -33,6 +33,10 @@ function agent_step(agent::Renter, model)
         all_unoccupied = sort(all_unoccupied, by=x -> x.rent, rev=true)
         # filter out the ones that are too expensive or below the minimum quality
         all_unoccupied = filter(x -> x.rent <= agent.max_rent && x.quality >= agent.min_quality, all_unoccupied)
+        # if the renter already had an address filter out lower quality rentals than the current one
+        if agent.address != 0
+            all_unoccupied = filter(x -> x.quality >= model[agent.address].quality, all_unoccupied)
+        end
         if length(all_unoccupied) > 0
             # if the agent already had an address, we need to free it
             if agent.address != 0
@@ -78,6 +82,6 @@ end
 
 function init_model()
     model_properties = Dict(:contract_duration => 12, :max_rent_increase_perc => 0.05, :rent_decrease_perc => 0.05)
-    return ABM(Union{Rental,Renter}; properties=model_properties)
+    return ABM(Union{Rental,Renter}; properties=model_properties, warn=false)
 end
 
