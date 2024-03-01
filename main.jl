@@ -1,5 +1,6 @@
 using Agents
 using Statistics
+using Random
 
 @agent Rental NoSpaceAgent begin
     rent::Int
@@ -95,8 +96,33 @@ function agent_step(agent::Rental, model)
     return
 end
 
-function init_model()
-    model_properties = Dict(:contract_duration => 12, :max_rent_increase_perc => 0.05, :rent_decrease_perc => 0.05)
+function model_step(model)
+    println("Running model step!")
+    newcomers_max = getproperty(model, :newcomers_max)
+    newcomers_min = getproperty(model, :newcomers_min)
+    newcomers_avr_quality = getproperty(model, :newcomers_avr_quality)
+    newcomers_avr_max_rent = getproperty(model, :newcomers_avr_max_rent)
+    newcomers = rand(newcomers_min:newcomers_max)
+    if newcomers > 0
+        for i in 1:newcomers
+            max_rent = rand(0.8*newcomers_avr_max_rent:1.2*newcomers_avr_max_rent)
+            quality = rand(0.8*newcomers_avr_quality:1.2*newcomers_avr_quality)
+            add_agent!(Renter, model, max_rent, 0, quality, 0, 0)
+            println("New renter with max rent $(max_rent) and quality $(quality) joined the model!")
+        end
+    end
+end
+
+function init_model(newcomers_max=0, newcomers_min=0, newcomers_avr_quality=50, newcomers_avr_max_rent=1000)
+    model_properties = Dict(
+        :contract_duration => 12,
+        :max_rent_increase_perc => 0.05,
+        :rent_decrease_perc => 0.05,
+        :newcomers_max => newcomers_max,
+        :newcomers_min => newcomers_min,
+        :newcomers_avr_quality => newcomers_avr_quality,
+        :newcomers_avr_max_rent => newcomers_avr_max_rent,
+    )
     return ABM(Union{Rental,Renter}; properties=model_properties, warn=false)
 end
 

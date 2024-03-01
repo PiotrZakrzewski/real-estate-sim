@@ -93,3 +93,9 @@ end
     @test renter4.id == good_rental.tenant
     @test another_renter.id == alreaedy_occupied_rental.tenant
 end
+
+@testset "Test model step: adding newcomers" begin
+    test_model5 = init_model(3, 3, 50, 1000)
+    step!(test_model5, agent_step, model_step, 1)
+    @test 3 == length(collect(allagents(test_model5)))
+end
