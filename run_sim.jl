@@ -21,7 +21,7 @@ function add_renters!(number::Int, max_rent_average::Int, min_quality_average::I
         max_rent = max_rent_average + rand(-100:100)
         min_quality = min_quality_average + rand(-10:10)
         desired_quality = desired_quality_average + rand(-10:10)
-        add_agent!(Renter, model, max_rent, min_quality, desired_quality, 0, 0)
+        add_agent!(Renter, model, max_rent, min_quality, desired_quality, 0, 0, 0.01)
     end
 end
 

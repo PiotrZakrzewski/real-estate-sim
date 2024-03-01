@@ -17,9 +17,19 @@ end
     desired_quality::Int
     months_renting::Int
     address::Int
+    leave_chance::Float64
 end
 
 function agent_step(agent::Renter, model)
+    if rand() < agent.leave_chance
+        println("Renter $(agent.id) is leaving the simulation!")
+        if agent.address != 0
+            old_address = model[agent.address]
+            old_address.tenant = 0
+        end
+        remove_agent!(agent, model)
+        return
+    end
     if agent.address != 0
         agent.months_renting += 1
     end
@@ -102,18 +112,19 @@ function model_step(model)
     newcomers_min = getproperty(model, :newcomers_min)
     newcomers_avr_quality = getproperty(model, :newcomers_avr_quality)
     newcomers_avr_max_rent = getproperty(model, :newcomers_avr_max_rent)
+    newcomers_leave_chance = getproperty(model, :newcomers_leave_chance)
     newcomers = rand(newcomers_min:newcomers_max)
     if newcomers > 0
         for i in 1:newcomers
             max_rent = rand(0.8*newcomers_avr_max_rent:1.2*newcomers_avr_max_rent)
             quality = rand(0.8*newcomers_avr_quality:1.2*newcomers_avr_quality)
-            add_agent!(Renter, model, max_rent, 0, quality, 0, 0)
+            add_agent!(Renter, model, max_rent, 0, quality, 0, 0, newcomers_leave_chance)
             println("New renter with max rent $(max_rent) and quality $(quality) joined the model!")
         end
     end
 end
 
-function init_model(newcomers_max=0, newcomers_min=0, newcomers_avr_quality=50, newcomers_avr_max_rent=1000)
+function init_model(newcomers_max=0, newcomers_min=0, newcomers_avr_quality=50, newcomers_avr_max_rent=1000, newcomers_leave_chance=0.0)
     model_properties = Dict(
         :contract_duration => 12,
         :max_rent_increase_perc => 0.05,
@@ -122,6 +133,7 @@ function init_model(newcomers_max=0, newcomers_min=0, newcomers_avr_quality=50, 
         :newcomers_min => newcomers_min,
         :newcomers_avr_quality => newcomers_avr_quality,
         :newcomers_avr_max_rent => newcomers_avr_max_rent,
+        :newcomers_leave_chance => newcomers_leave_chance
     )
     return ABM(Union{Rental,Renter}; properties=model_properties, warn=false)
 end

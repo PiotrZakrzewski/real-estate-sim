@@ -7,7 +7,7 @@ include("main.jl")
     test_model1 = init_model()
 
     rental1 = add_agent!(Rental, test_model1, 1, 1, 1, 0, 0, 0)
-    renter1 = add_agent!(Renter, test_model1, 1, 1, 1, 0, 0)
+    renter1 = add_agent!(Renter, test_model1, 1, 1, 1, 0, 0, 0.0)
 
     rental1.tenant = renter1.id
     renter1.address = rental1.id
@@ -51,7 +51,7 @@ end
     test_model3 = init_model()
 
     rental3 = add_agent!(Rental, test_model3, 1000, 50, 500, 0, 11, 0)
-    renter3 = add_agent!(Renter, test_model3, 1000, 50, 500, 0, 0)
+    renter3 = add_agent!(Renter, test_model3, 1000, 50, 500, 0, 0, 0.0)
 
     rental3.tenant = renter3.id
     renter3.address = rental3.id
@@ -79,11 +79,11 @@ end
     good_rental = add_agent!(Rental, test_model4, 800, 60, 500, 0, 0, 0)
     alreaedy_occupied_rental = add_agent!(Rental, test_model4, 800, 60, 500, 0, 0, 0)
 
-    another_renter = add_agent!(Renter, test_model4, 1000, 55, 500, 0, 0)
+    another_renter = add_agent!(Renter, test_model4, 1000, 55, 500, 0, 0, 0.0)
     alreaedy_occupied_rental.tenant = another_renter.id
     another_renter.address = alreaedy_occupied_rental.id
 
-    renter4 = add_agent!(Renter, test_model4, 1000, 50, 500, 0, 0)
+    renter4 = add_agent!(Renter, test_model4, 1000, 50, 500, 0, 0, 0.0)
 
     step!(test_model4, agent_step, 1)
 
@@ -98,4 +98,17 @@ end
     test_model5 = init_model(3, 3, 50, 1000)
     step!(test_model5, agent_step, model_step, 1)
     @test 3 == length(collect(allagents(test_model5)))
+end
+
+@testset "Test agent_step: agent leaving town" begin
+    test_model = init_model()
+    leaving_renter = add_agent!(Renter, test_model, 1000, 50, 500, 0, 0, 1.0)
+    leaving_renter_rental = add_agent!(Rental, test_model, 900, 40, 500, 0, 0, leaving_renter.id)
+    leaving_renter.address = leaving_renter_rental.id
+    add_agent!(Renter, test_model, 1000, 50, 500, 0, 0, 0.0)
+    @test 3 == length(collect(allagents(test_model)))
+    @test leaving_renter_rental.id == leaving_renter.address
+    step!(test_model, agent_step, 1)
+    @test 2 == length(collect(allagents(test_model)))
+    @test 0 == leaving_renter_rental.tenant
 end
