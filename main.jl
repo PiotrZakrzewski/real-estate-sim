@@ -106,8 +106,25 @@ function agent_step(agent::Rental, model)
     return
 end
 
+function housing_satisfaction(model)
+    renters = filter(x -> x isa Renter, collect(allagents(model)))
+    satisfaction = []
+    for renter in renters
+        if renter.address != 0
+            rental = model[renter.address]
+            push!(satisfaction, min(100 - (renter.desired_quality - rental.quality), 100))
+        end
+    end
+    if length(satisfaction) == 0
+        return 0
+    end
+    return round(mean(satisfaction))
+end
+
 function model_step(model)
     println("Running model step!")
+    housing_satisfaction_score = housing_satisfaction(model)
+    model.housing_satisfaction = housing_satisfaction_score
     newcomers_max = getproperty(model, :newcomers_max)
     newcomers_min = getproperty(model, :newcomers_min)
     newcomers_avr_quality = getproperty(model, :newcomers_avr_quality)
@@ -133,7 +150,8 @@ function init_model(newcomers_max=0, newcomers_min=0, newcomers_avr_quality=50, 
         :newcomers_min => newcomers_min,
         :newcomers_avr_quality => newcomers_avr_quality,
         :newcomers_avr_max_rent => newcomers_avr_max_rent,
-        :newcomers_leave_chance => newcomers_leave_chance
+        :newcomers_leave_chance => newcomers_leave_chance,
+        :housing_satisfaction => 0
     )
     return ABM(Union{Rental,Renter}; properties=model_properties, warn=false)
 end

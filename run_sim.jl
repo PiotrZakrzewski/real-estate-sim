@@ -1,7 +1,6 @@
 
 include("main.jl")
 using Agents
-# using CairoMakie
 using GLMakie
 using Random
 using Statistics
@@ -70,32 +69,21 @@ function run_sim(steps)
     empty!(ax3)
     empty!(ax4)
     test_model1 = init_model()
-    function housing_satisfaction(agent_ids)
-        renters = [test_model1[agent_id] for agent_id in agent_ids if is_renter(test_model1[agent_id])]
-        satisfaction = []
-        for renter in renters
-            if renter.address != 0
-                rental = test_model1[renter.address]
-                push!(satisfaction, min(100 - (renter.desired_quality - rental.quality), 100))
-            end
-        end
-        if length(satisfaction) == 0
-            return 0
-        end
-        return round(mean(satisfaction))
-    end
+
     add_rentals!(20, 1000, 50, test_model1)
     add_renters!(21, 2000, 40, 55, test_model1)
-    agent_df, _ = run!(test_model1, agent_step, model_step, steps, adata=[
+    agent_df, model_df = run!(test_model1, agent_step, model_step, steps, adata=[
         (:rent, mean, is_rental),
         (:tenant, count_empty_rentals, is_rental),
         (:address, count_homeless, is_renter),
-        (:id, housing_satisfaction)
-    ]
+        # (:id, housing_satisfaction)
+    ],
+    mdata=[:housing_satisfaction]
     )
+    println(model_df)
     lines!(ax1, agent_df[!, :step], agent_df[!, :mean_rent_is_rental], color=:blue)
     lines!(ax2, agent_df[!, :step], agent_df[!, :count_homeless_address_is_renter], color=:red)
-    # lines!(ax3, agent_df[!, :step], agent_df[!, :housing_satisfaction_id], color=:green)
+    lines!(ax3, model_df[!, :step], model_df[!, :housing_satisfaction], color=:green)
     lines!(ax4, agent_df[!, :step], agent_df[!, :count_empty_rentals_tenant_is_rental], color=:orange)
 end
 # save("rental_simulation.png", f)
