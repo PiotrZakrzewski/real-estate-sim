@@ -90,6 +90,7 @@ sg = SliderGrid(
     tellheight=false)
 f[6, :] = buttongrid = GridLayout(tellwidth=false)
 run_button = buttongrid[1, 1] = Button(f, label="Run")
+save_png_button = buttongrid[1, 2] = Button(f, label="Save PNG")
 on(run_button.clicks) do n
     steps = to_value(sg.sliders[1].value)
     rentals = to_value(sg.sliders[2].value)
@@ -98,6 +99,10 @@ on(run_button.clicks) do n
     avr_renter_budget = to_value(sg.sliders[5].value)
 
     run_sim(steps, rentals, renters, avr_rent, avr_renter_budget)
+end
+
+on(save_png_button.clicks) do n
+    save("rental_market_simulation.png", f)
 end
 
 display(f, title="Rental Market Simulation")
