@@ -58,23 +58,22 @@ ax4 = Axis(f[2, 2],
 )
 
 
-function run_sim(steps)
+function run_sim(steps, rentals, renters, avr_rent, avr_renter_budget)
     empty!(ax1)
     empty!(ax2)
     empty!(ax3)
     empty!(ax4)
     test_model1 = init_model()
 
-    add_rentals!(20, 1000, 50, test_model1)
-    add_renters!(21, 2000, 40, 55, test_model1)
+    add_rentals!(rentals, avr_rent, 50, test_model1)
+    add_renters!(renters, avr_renter_budget, 40, 55, test_model1)
     agent_df, model_df = run!(test_model1, agent_step, model_step, steps, adata=[
-        (:rent, mean, is_rental),
-        (:tenant, count_empty_rentals, is_rental),
-        (:address, count_homeless, is_renter),
-    ],
-    mdata=[:housing_satisfaction]
+            (:rent, mean, is_rental),
+            (:tenant, count_empty_rentals, is_rental),
+            (:address, count_homeless, is_renter),
+        ],
+        mdata=[:housing_satisfaction]
     )
-    println(model_df)
     lines!(ax1, agent_df[!, :step], agent_df[!, :mean_rent_is_rental], color=:blue)
     lines!(ax2, agent_df[!, :step], agent_df[!, :count_homeless_address_is_renter], color=:red)
     lines!(ax3, model_df[!, :step], model_df[!, :housing_satisfaction], color=:green)
@@ -82,14 +81,23 @@ function run_sim(steps)
 end
 
 sg = SliderGrid(
-    f[3, :],
+    f[4, :],
     (label="Months", range=1:48, startvalue=18),
-    width=350,
+    (label="Rentals", range=1:100, startvalue=20),
+    (label="Renters", range=1:100, startvalue=21),
+    (label="Avr. Rent", range=500:1500, startvalue=1000),
+    (label="Avr. renter's budget", range=1000:3000, startvalue=2000),
     tellheight=false)
-f[4, :] = buttongrid = GridLayout(tellwidth=false)
+f[6, :] = buttongrid = GridLayout(tellwidth=false)
 run_button = buttongrid[1, 1] = Button(f, label="Run")
 on(run_button.clicks) do n
-    run_sim(to_value(sg.sliders[1].value))
+    steps = to_value(sg.sliders[1].value)
+    rentals = to_value(sg.sliders[2].value)
+    renters = to_value(sg.sliders[3].value)
+    avr_rent = to_value(sg.sliders[4].value)
+    avr_renter_budget = to_value(sg.sliders[5].value)
+
+    run_sim(steps, rentals, renters, avr_rent, avr_renter_budget)
 end
 
 display(f, title="Rental Market Simulation")
