@@ -1,14 +1,13 @@
 
-include("main.jl")
+include("sim.jl")
 using Agents
 using GLMakie
 using Random
 using Statistics
 
 
-
 function add_rentals!(number::Int, rent_average::Int, quality_average::Int, model)
-    for i in 1:number
+    for _ in 1:number
         rent = rent_average + rand(-100:100)
         minimum_rent = rent - rand(100:300)
         quality = quality_average + rand(-10:10)
@@ -17,14 +16,13 @@ function add_rentals!(number::Int, rent_average::Int, quality_average::Int, mode
 end
 
 function add_renters!(number::Int, max_rent_average::Int, min_quality_average::Int, desired_quality_average::Int, model)
-    for i in 1:number
+    for _ in 1:number
         max_rent = max_rent_average + rand(-100:100)
         min_quality = min_quality_average + rand(-10:10)
         desired_quality = desired_quality_average + rand(-10:10)
         add_agent!(Renter, model, max_rent, min_quality, desired_quality, 0, 0, 0.01)
     end
 end
-
 
 
 is_rental(a) = a isa Rental
@@ -35,9 +33,6 @@ is_homeless(address) = address == 0
 
 count_empty_rentals(tenants) = count(is_empty, tenants)
 count_homeless(addresses) = count(is_homeless, addresses)
-
-
-
 
 
 f = Figure()
@@ -76,7 +71,6 @@ function run_sim(steps)
         (:rent, mean, is_rental),
         (:tenant, count_empty_rentals, is_rental),
         (:address, count_homeless, is_renter),
-        # (:id, housing_satisfaction)
     ],
     mdata=[:housing_satisfaction]
     )
@@ -86,7 +80,6 @@ function run_sim(steps)
     lines!(ax3, model_df[!, :step], model_df[!, :housing_satisfaction], color=:green)
     lines!(ax4, agent_df[!, :step], agent_df[!, :count_empty_rentals_tenant_is_rental], color=:orange)
 end
-# save("rental_simulation.png", f)
 
 sg = SliderGrid(
     f[3, :],

@@ -86,7 +86,6 @@ function agent_step(agent::Rental, model)
         end
 
         rent_decrease = getproperty(model, :rent_decrease_perc) * agent.rent
-        # round up to the nearest integer
         rent_decrease = Int(ceil(rent_decrease))
         agent.rent -= rent_decrease
         agent.rent = max(agent.rent, agent.minimum_rent)
@@ -96,9 +95,7 @@ function agent_step(agent::Rental, model)
         agent.months_occupied += 1
         if agent.months_occupied % getproperty(model, :contract_duration) == 0
             rent_increase = getproperty(model, :max_rent_increase_perc) * agent.rent
-            # round up to the nearest integer
             rent_increase = Int(ceil(rent_increase))
-            # log the rent increase
             println("Rent increased by $rent_increase for agent $(agent.id) to $(agent.rent + rent_increase)!")
             agent.rent += rent_increase
         end
@@ -122,7 +119,7 @@ function housing_satisfaction(model)
 end
 
 function model_step(model)
-    println("Running model step!")
+    println("Running model step")
     housing_satisfaction_score = housing_satisfaction(model)
     model.housing_satisfaction = housing_satisfaction_score
     newcomers_max = getproperty(model, :newcomers_max)
