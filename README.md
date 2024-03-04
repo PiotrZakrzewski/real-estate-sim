@@ -36,6 +36,12 @@ activate    # activate local project
 instantiate # install the dependancies
 ```
 
+Verify by running tests
+
+```shell
+julia --project=. sim_test.jl
+```
+
 ## Usage
 
 You can start the GLMakie based GUI with the provided convenience script
