@@ -47,3 +47,7 @@ There are two `NoSpaceAgent` types of agents in this simulation:
 ![Rentrer's Decision Tree](renter-decision-tree.png)
 
 The Rental's behaviour mostly revolves around the decision to increase/decrease the rent. After 12 months of being occupied it always increases the rent by the max legally allowed (5% by default), using values resembling what is common in the Dutch rental market. If it is vacated it sets its new rent to the market value: an average of rentals of comparable quality. The rent is decreased by 5% every month of being vacant beginning with the second one.
+
+## Contributions
+
+Your feedback and contributions are welcome! If you have suggestions for improvement or wish to contribute to the development of this simulation, please feel free to open an issue or submit a pull request.
