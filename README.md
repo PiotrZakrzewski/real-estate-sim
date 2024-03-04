@@ -2,6 +2,15 @@
 
 ![](rental_market_simulation.png)
 
+## Table of Contents
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Agent Behavior](#agent-behaviour)
+- [Contributions](#contributions)
+
+## Introduction
+
 This project uses [Agents.jl](https://juliadynamics.github.io/Agents.jl/stable/) and is an example of a simple simulation with more than one type of agent (Renters and Rental properties), with each independently perform actions either to maximize their housing satisfaction (inhabiting a desired rental property by a Renter agent) or maximizing rental income (for a Rental agents).
 
 The main goals of this project:
@@ -38,7 +47,7 @@ You can start the GLMakie based GUI with the provided convenience script
 Change the parameters using sliders and press `run`, the first time you press it there will be significant delay before the results are rendered, the subsequent runs will be faster.
 Press save PNG tp save the current output, it will be saved as `rental_market_simulation.png` in the current working directory.
 
-## Agent bahviour
+## Agent Behaviour
 
 There are two `NoSpaceAgent` types of agents in this simulation:
 - Renter, wants to live in the best quality Rental they can afford
