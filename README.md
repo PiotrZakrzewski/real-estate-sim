@@ -11,7 +11,7 @@
 
 ## Introduction
 
-This project uses [Agents.jl](https://juliadynamics.github.io/Agents.jl/stable/) and is an example of a simple simulation with more than one type of agent (Renters and Rental properties), with each independently perform actions either to maximize their housing satisfaction (inhabiting a desired rental property by a Renter agent) or maximizing rental income (for a Rental agents).
+This project uses [Agents.jl](https://juliadynamics.github.io/Agents.jl/stable/) and implements a simple simulation featuring multiple types of agents (Renters and Rental Properties), where each type independently performs actions aimed at either maximizing their housing satisfaction (for Renters, this means inhabiting a desired rental property) or maximizing rental income (for Rental agents)
 
 The main goals of this project:
 - Showcase for Julia's Agents.jl framework, I want to learn about it and see what I can use it for.
